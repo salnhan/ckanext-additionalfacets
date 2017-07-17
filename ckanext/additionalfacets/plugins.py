@@ -1,7 +1,6 @@
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 
-import json
 import os
 import pylons.config as config
 
@@ -69,13 +68,57 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
 
     # Private methods
     def _get_facets_with_translation(self):
-        language = additional_facets_helpers.lang()
-        facets = self.additional_facets['facets']
+        '''
+        Get the translated facet title
+        '''
+        # name of additional facets
         additional_facets_name = {}
+
+        # get all additional facets
+        facets = self.additional_facets['facets']
+
+        # stop if the facet list is empty
         if not facets:
             return additional_facets_name
-        
+
+        # get current environment's language
+        language = additional_facets_helpers.lang()
+
+        # search and get the translated title for facet
         for facet in facets:
             additional_facets_name[facet['dataset_field']] = facet['facet_name'][language]
 
         return additional_facets_name
+
+
+    def _get_translated_label_of_facet_item(self, dataset_facet_field, default_facet_label):
+        '''
+        Translate the default label of facet item. Return the default facet label if no translation available
+        :param dataset_facet_field: the name of facet field in the dataset
+        :param default_facet_label: the default label of the facet item
+        '''
+
+        # get all additional facets
+        facets = self.additional_facets['facets']
+         # if facets not empty
+        if facets:
+            for facet in facets:
+                # get the concrete facet
+                if facet['dataset_field'] == dataset_facet_field:
+                    facet_items = facet['facet_items']
+                    for facet_item in facet_items:
+                        # translate the label of facet
+                        if facet_item['default_label'] == default_facet_label:
+                            language = additional_facets_helpers.lang()
+                            default_facet_label = facet_item['new_label'][language]
+
+        return default_facet_label
+
+
+
+    ## Define own helpers
+    def get_helpers(self):
+        return {
+            # This helper function will be called in snippets/facet_list.html
+           'additionalfacets_translate_facet_item_label': self._get_translated_label_of_facet_item
+        }

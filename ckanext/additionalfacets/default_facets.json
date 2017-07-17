@@ -1,0 +1,41 @@
+{
+  "facets": [
+    {
+      "dataset_field": "extras_information_category",
+      "facet_name": {
+          "en": "Information categories",
+          "de": "Informationskategorien"
+      },
+      "facet_items": [
+        {
+          "default_label": "Bauen & Wohnen",
+          "new_label": {
+            "en": "Build & Live",
+            "de": "Bauen & Wohnen"
+          }
+        },
+        {
+          "default_label": "Bildung & Wissenschaft",
+          "new_label": {
+            "en": "Education & Economy",
+            "de": "Bildung & Wissenschaft"
+          }
+        },
+        {
+          "default_label": "natur_umwelt",
+          "new_label": {
+            "en": "Nature & Environment",
+            "de": "Natur & Umwelt"
+          }
+        }
+      ]
+    },
+    {
+      "dataset_field": "author",
+      "facet_name": {
+        "en": "Author",
+        "de": "Autor"
+      }
+    }
+  ]
+}
