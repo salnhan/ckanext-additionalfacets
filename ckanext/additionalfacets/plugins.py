@@ -35,8 +35,6 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         '''
         Insert additional facets to dataset search page
         '''
-        language = additional_facets_helpers.lang()
-        # additional_facets = self._get_facets_label(language)
         additional_facets = self._get_facets_with_translation()
         facets_dict.update(additional_facets)
 
@@ -48,8 +46,7 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         Insert additional facets to group search page
         '''
         if self.display_facets_on_group_page:
-            language = additional_facets_helpers.lang()
-            additional_facets = self._get_facets_label(language)
+            additional_facets = self._get_facets_with_translation()
             facets_dict.update(additional_facets)
 
         return facets_dict
@@ -59,8 +56,7 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         Insert additional facets to organization search page
         '''
         if self.display_facets_on_group_page:
-           language = additional_facets_helpers.lang()
-           additional_facets = self._get_facets_label(language)
+           additional_facets = self._get_facets_with_translation()
            facets_dict.update(additional_facets)
 
         return facets_dict
@@ -86,7 +82,10 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
 
         # search and get the translated title for facet
         for facet in facets:
-            additional_facets_name[facet['dataset_field']] = facet['facet_name'][language]
+            if facet['facet_name'][language]:
+                additional_facets_name[facet['dataset_field']] = facet['facet_name'][language]
+            else:
+                additional_facets_name[facet['dataset_field']] = facet['facet_name']
 
         return additional_facets_name
 
@@ -110,7 +109,8 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
                         # translate the label of facet
                         if facet_item['default_label'] == default_facet_label:
                             language = additional_facets_helpers.lang()
-                            default_facet_label = facet_item['new_label'][language]
+                            if facet_item['new_label'][language]:
+                                default_facet_label = facet_item['new_label'][language]
 
         return default_facet_label
 
