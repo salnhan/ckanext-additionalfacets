@@ -37,10 +37,75 @@ ckan.plugins = additional_facets
 
 # ckanext-additionalfacets settings
 ## additional facets list
-ckanext.additional_facets = ckanext.additionalfacets.default_facets.json
+ckanext.additional_facets = ckanext.additionalfacets:default_facets.json
 ## allows to display facets on group page (true/false)
 additional_facets.display_on_group_page = true
 ## allows to display facets on organization page (true/falese)
 ckanext.additional_facets.display_on_org_page = true
 
+```
+
+Example for additional facets in json
+-----------------------
+
+* [default facets](ckanext/additionalfacets/default_facets.json)
+
+
+Field Keys
+----------
+
+### `facets`
+
+The `facets` array of facet 
+A facet include:
+
+* `dataset_field` - field name in the dataset, which will be display in the CKAN facets
+* `facet_name` - the title of the facet with translation
+* `facet_items`- (optional) to be used in order to translate the label of the facet items
+
+Translation for a facet title
+-----------------------------
+```json
+{
+  "dataset_field": "extras_information_category",
+  "facet_name": {
+    "en": "Information categories",
+    "de": "Informationskategorien"
+  }
+}
+```
+
+Translation for a facet item
+-----------------------------
+```json
+{
+  "dataset_field": "extras_information_category",
+  "facet_name": {
+        "en": "Information categories",
+        "de": "Informationskategorien"
+  },
+  "facet_items": [
+    {
+      "default_label": "Bauen & Wohnen",
+      "new_label": {
+        "en": "Build & Live",
+        "de": "Bauen & Wohnen"
+      }
+    },
+    {
+      "default_label": "Bildung & Wissenschaft",
+      "new_label": {
+        "en": "Education & Economy",
+        "de": "Bildung & Wissenschaft"
+      }
+    },
+    {
+      "default_label": "natur_umwelt",
+      "new_label": {
+        "en": "Nature & Environment",
+        "de": "Natur & Umwelt"
+      }
+    }
+  ]
+}
 ```
