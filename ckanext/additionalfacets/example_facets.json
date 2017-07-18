@@ -10,11 +10,7 @@
     },
     {
       "dataset_type": "basic-dataset",
-      "dataset_field": "extras_information_type",
-      "facet_name": {
-        "en": "Information type",
-        "de": "Informationsgegenstand"
-      }
+      "dataset_field": "extras_registerobject_type"
     },
     {
       "dataset_field": "groups",

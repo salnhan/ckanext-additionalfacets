@@ -7,81 +7,38 @@
     }
   },
   {
-    "value": "Bevölkerung, Demografie & Integration",
-    "label": "Bevölkerung, Demografie & Integration"
-  },
-  {
-    "value": "Bildung & Wissenschaft",
-    "label": {
-      "en": "Education & Science",
-      "de": "Bildung & Wissenschaft"
-    }
-  },
-  {
-    "value": "Ehrenamt",
-    "label": "Ehrenamt"
-  },
-  {
-    "value": "Energie & Klima",
-    "label": "Energie & Klima"
-  },
-  {
-    "value": "Europa & Außenbeziehungen",
-    "label": "Europa & Außenbeziehungen"
-  },
-  {
-    "value": "Gemeinden & Gemeindeverbände",
-    "label": {
-      "en": "Community & Associations",
-      "de": "Gemeinden & Gemeindeverbände"
-    }
-  },
-  {
-    "value": "Geografie, Geologie & Geodaten",
-    "label": "Geografie, Geologie & Geodaten"
-  },
-  {
-    "value": "Infrastruktur",
-    "label": "Infrastruktur"
-  },
-  {
-    "value": "Kultur, Sport & Tourismus",
-    "label": "Kultur, Sport & Tourismus"
-  },
-  {
-    "value": "Landesplanung",
-    "label": "Landesplanung"
-  },
-  {
-    "value": "Landwirtschaft, Weinbau & Forsten",
-    "label": "Landwirtschaft, Weinbau & Forsten"
-  },
-  {
     "value": "Natur & Umwelt",
-    "label": "Natur & Umwelt"
-  },
-  {
-    "value": "Öffentliche Verwaltung, Haushalt & Steuern",
-    "label": "Öffentliche Verwaltung, Haushalt & Steuern"
+    "label": {
+      "en": "Nature & Environment",
+      "de": "Natur & Umwelt"
+    }
   },
   {
     "value": "Politik & Wählen",
-    "label": "Politik & Wählen"
-  },
-  {
-    "value": "Soziales, Familie, Kinder, Jugend & Frauen",
-    "label": "Soziales, Familie, Kinder, Jugend & Frauen"
+    "label": {
+      "en": "Politics & Elections",
+      "de": "Politik & Wählen"
+    }
   },
   {
     "value": "Transport & Verkehr",
-    "label": "Transport & Verkehr"
+    "label": {
+      "en": "Transport & Traffic",
+      "de": "Transport & Verkehr"
+    }
   },
   {
     "value": "Verbraucherschutz",
-    "label": "Verbraucherschutz"
+    "label": {
+      "en": "Consumer protection",
+      "de": "Verbraucherschutz"
+    }
   },
   {
     "value": "Wirtschaft & Arbeit",
-    "label": "Wirtschaft & Arbeit"
+    "label": {
+      "en": "Economy & Work",
+      "de": "Wirtschaft & Arbeit"
+    }
   }
 ]
