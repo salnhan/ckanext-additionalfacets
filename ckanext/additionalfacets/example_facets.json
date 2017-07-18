@@ -1,10 +1,26 @@
 {
   "facets": [
     {
+      "dataset_type": "basic-dataset",
       "dataset_field": "extras_information_category",
       "facet_name": {
-          "en": "Information categories",
-          "de": "Informationskategorien"
+        "en": "Information categories",
+        "de": "Informationskategorien"
+      }
+    },
+    {
+      "dataset_type": "basic-dataset",
+      "dataset_field": "extras_information_type",
+      "facet_name": {
+        "en": "Information type",
+        "de": "Informationsgegenstand"
+      }
+    },
+    {
+      "dataset_field": "groups",
+      "facet_name": {
+        "en": "Group",
+        "de": "Gruppe"
       },
       "facet_items": [
         {
@@ -15,10 +31,10 @@
           }
         },
         {
-          "default_label": "Bildung & Wissenschaft",
+          "default_label": "Wirtschaft und Arbeit",
           "new_label": {
-            "en": "Education & Economy",
-            "de": "Bildung & Wissenschaft"
+            "en": "Economy & Job",
+            "de": "Wirtschaft und Arbeit"
           }
         },
         {

@@ -1,0 +1,113 @@
+{
+  "scheming-version": 1,
+  "dataset_type": "basic-dataset",
+  "dataset_type_label": {
+    "en": "general meta data",
+    "de": "Allgemeine Metadaten"
+  },
+  "about": "A basic CKAN dataset schema",
+  "dataset_fields": [
+    {
+      "field_name": "title",
+      "label": {
+        "en": "Title",
+        "de": "Titel"
+      },
+      "preset": "title",
+      "form_placeholder": "e.g January 2011 Gold Prices"
+    },
+    {
+      "field_name": "name",
+      "label": "URL",
+      "preset": "dataset_slug",
+      "form_placeholder": "eg. my-dataset"
+    },
+    {
+      "field_name": "notes",
+      "label": {
+        "en": "Description",
+        "de": "Beschreibung"
+      },
+      "form_snippet": "markdown.html",
+      "form_placeholder": "eg. Some useful notes about the data"
+    },
+    {
+      "field_name": "information_category",
+      "label": {
+        "en": "Information category",
+        "de": "Informationskategorie"
+      },
+      "help_text": {
+        "en": "Select a category for dataset",
+        "de": "Eine Categorie für Datensatz auswählen"
+      },
+      "help_inline": true,
+      "required": true,
+      "preset": "select",
+      "choices_helper": "rlp_information_categories_choices"
+    },
+    {
+      "field_name": "registerobject_type",
+      "label": {
+        "en": "Information type",
+        "de": "Informationsstatbestand"
+      },
+      "help_text": {
+        "en": "Select a type for the information",
+        "de": "Ein Informations-Typ auswählen"
+      },
+      "help_inline": true,
+      "required": true,
+      "preset": "select",
+      "choices_helper": "rlp_registerobject_type_choices"
+    },
+    {
+      "field_name": "supplier",
+      "label": {
+        "en": "Supplier",
+        "de": "Liefersystem"
+      }
+    },
+    {
+      "field_name": "owner_org",
+      "label": {
+        "en": "Organization",
+        "de": "Organisation"
+      },
+      "preset": "dataset_organization"
+    },
+    {
+      "field_name": "license_id",
+      "label": {
+        "en": "License",
+        "de": "Lizenz"
+      },
+      "form_snippet": "license.html",
+      "help_text": "License definitions and additional information can be found at http://opendefinition.org/",
+      "help_inline": true
+    }
+  ],
+  "resource_fields": [
+    {
+      "field_name": "url",
+      "label": "URL",
+      "preset": "resource_url_upload"
+    },
+    {
+      "field_name": "name",
+      "label": "Name",
+      "form_placeholder": "eg. January 2011 Gold Prices"
+    },
+    {
+      "field_name": "description",
+      "label": "Description",
+      "form_snippet": "markdown.html",
+      "form_placeholder": "Some useful notes about the data"
+    },
+    {
+      "field_name": "format",
+      "label": "Format",
+      "preset": "resource_format_autocomplete"
+    }
+  ]
+}
