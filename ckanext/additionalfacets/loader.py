@@ -57,4 +57,9 @@ def get_additional_facets(facet_input):
     '''
     Get additional facets from input (single)
     '''
-    return load_facets_module_path(facet_input)
+    additional_facets = load_facets_module_path(facet_input)
+
+    if additional_facets is None or 'facets' not in additional_facets:
+        additional_facets = []
+
+    return additional_facets
