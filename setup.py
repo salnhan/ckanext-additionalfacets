@@ -68,6 +68,7 @@ setup(
     entry_points='''
         [ckan.plugins]
             additional_facets=ckanext.additionalfacets.plugins:AdditionalFacetsPlugin
+            additional_facets_from_scheming_dataset=ckanext.additionalfacets.plugins:AdditionalFacetsFromSchemingDatasetPlugin
 
         [paste.paster_command]
             additional_facets=ckanext.additionalfacets.commands:AdditionalFacetsCommand
