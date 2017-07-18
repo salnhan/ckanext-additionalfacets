@@ -42,6 +42,7 @@ def load_facets_module_path(relative_path):
         watch_file(file_path)
         return load(open(file_path))
 
+
 def get_additional_facets_dict(facets_inputs):
     '''
     Get the list of facets
@@ -53,13 +54,15 @@ def get_additional_facets_dict(facets_inputs):
         result[additional_facets['name']] = additional_facets
     return result
 
+
 def get_additional_facets(facet_input):
     '''
     Get additional facets from input (single)
     '''
     additional_facets = load_facets_module_path(facet_input)
 
-    if additional_facets is None or 'facets' not in additional_facets:
-        additional_facets = []
+    # if file not found or element 'facets' does not exist in the facet list
+    if additional_facets is None or 'facets' not in additional_facets or additional_facets['facets'] is None:
+        return []
 
-    return additional_facets
+    return additional_facets['facets']
