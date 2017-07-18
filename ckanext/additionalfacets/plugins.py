@@ -4,7 +4,6 @@ import ckan.plugins.toolkit as toolkit
 import os
 import pylons.config as config
 
-
 from ckanext.additionalfacets import loader
 from ckanext.additionalfacets import helpers as additional_facets_helpers
 
@@ -17,19 +16,28 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.ITemplateHelpers)
 
     # Constants
+    ## configuration file
     ADDITIONAL_FACETS_CONFIG = 'ckanext.additional_facets'
     DISPLAY_FACETS_ON_GROUPS_PAGE = 'ckanext.additional_facets.display_on_group_page'
     DISPLAY_FACETS_ON_ORG_PAGE = 'ckanext.additional_facets.display_on_org_page'
     CLEAR_DEFAULT_FACETS = 'ckanext.additional_facets.clear_default_facets'
 
+    ##fields in the json/yaml file
+    DATASET_FIELD_FIELD = 'dataset_field'
+    DATASET_TYPE_FIELD = 'dataset_type'
+    FACET_NAME_FIELD = 'facet_name'
+    FACET_ITEMS_FIELD = 'facet_items'
+    DEFAULT_LABEL_FIELD = 'default_label'
+    NEW_LABEL_FIELD = 'new_label'
 
     # IConfigurer
     def update_config(self, config):
         toolkit.add_template_directory(config, 'templates')
         facets_inputs = config.get(self.ADDITIONAL_FACETS_CONFIG, '').split()
 
-        # get additional facets from the first input
+        # get additional facets from the input
         self.additional_facets = loader.get_additional_facets(facets_inputs[0])
+
         self.display_facets_on_group_page = toolkit.asbool(config.get(self.DISPLAY_FACETS_ON_GROUPS_PAGE, False))
         self.display_facets_on_org_page = toolkit.asbool(config.get(self.DISPLAY_FACETS_ON_ORG_PAGE, False))
         self.clear_default_facets = toolkit.asbool(config.get(self.CLEAR_DEFAULT_FACETS, False))
@@ -40,12 +48,15 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         '''
         Insert additional facets to dataset search page
         '''
+        # if no facets to insert
+        if not self.additional_facets:
+            return facets_dict
+
         # clear default facets
         if self.clear_default_facets:
             facets_dict.clear()
 
-        additional_facets = self._get_facets_with_translation()
-        facets_dict.update(additional_facets)
+        facets_dict.update(self._get_facets_title_with_translation())
 
         return facets_dict
 
@@ -54,48 +65,54 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         '''
         Insert additional facets to group search page
         '''
+        # stop if no facets to insert
+        if not self.translated_additional_facets:
+            return facets_dict
+
         if self.display_facets_on_group_page:
-            additional_facets = self._get_facets_with_translation()
-            facets_dict.update(additional_facets)
+            facets_dict.update(self._get_facets_title_with_translation())
 
         return facets_dict
+
 
     def organization_facets(self, facets_dict, organization_type, package_type):
         '''
         Insert additional facets to organization search page
         '''
+        # if no facets to insert
+        if not self.translated_additional_facets:
+            return facets_dict
+
         if self.display_facets_on_group_page:
-           additional_facets = self._get_facets_with_translation()
-           facets_dict.update(additional_facets)
+           facets_dict.update(self._get_facets_title_with_translation())
 
         return facets_dict
 
 
     # Private methods
-    def _get_facets_with_translation(self):
+    def _get_facets_title_with_translation(self):
         '''
         Get the translated facet title
         '''
         # name of additional facets
         additional_facets_name = {}
 
-        # get all additional facets
-        facets = self.additional_facets['facets']
-
         # stop if the facet list is empty
-        if not facets:
+        if not self.additional_facets:
             return additional_facets_name
 
         # get current environment's language
         language = additional_facets_helpers.lang()
 
         # search and get the translated title for facet
-        for facet in facets:
-            if facet['dataset_field'] and facet['facet_name']:
-                if facet['facet_name'][language]:
-                    additional_facets_name[facet['dataset_field']] = facet['facet_name'][language]
-                else:
-                    additional_facets_name[facet['dataset_field']] = facet['facet_name']
+        for facet in self.additional_facets:
+            if self.DATASET_FIELD_FIELD in facet and self.FACET_NAME_FIELD in facet:
+                label_array = facet_item[self.FACET_NAME_FIELD]
+                for key, value in label_array.iteritems():
+                    if key == language and value is not None:
+                         additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = value
+                    else:
+                        additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = facet[self.FACET_NAME_FIELD]
 
         return additional_facets_name
 
@@ -107,20 +124,20 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         :param default_facet_label: the default label of the facet item
         '''
 
-        # get all additional facets
-        facets = self.additional_facets['facets']
         # if facets not empty
-        if facets:
-            for facet in facets:
+        if self.additional_facets:
+            for facet in self.additional_facets:
                 # get the concrete facet
-                if 'dataset_field' in facet and facet['dataset_field'] == dataset_facet_field and 'facet_items' in facet:
-                    facet_items = facet['facet_items']
+                if self.DATASET_FIELD_FIELD in facet and facet[self.DATASET_FIELD_FIELD] == dataset_facet_field and self.FACET_ITEMS_FIELD in facet:
+                    facet_items = facet[self.FACET_ITEMS_FIELD]
                     for facet_item in facet_items:
                         # translate the label of facet
-                        if facet_item['default_label'] == default_facet_label:
+                        if facet_item[self.DEFAULT_LABEL_FIELD] == default_facet_label:
                             language = additional_facets_helpers.lang()
-                            if facet_item['new_label'][language]:
-                                default_facet_label = facet_item['new_label'][language]
+                            label_array = facet_item[self.NEW_LABEL_FIELD]
+                            for key, value in label_array.iteritems():
+                                if key == language and value is not None:
+                                    default_facet_label = value
 
         return default_facet_label
 
@@ -149,21 +166,74 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
 class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
 
     # Private methods
+    # Override the parent's method
+    def _get_facets_title_with_translation(self):
+        '''
+        Get the translated facet title
+        '''
+        # name of additional facets
+        additional_facets_name = {}
+
+        # stop if the facet list is empty
+        if not self.additional_facets:
+            return additional_facets_name
+
+        # get current environment's language
+        language = additional_facets_helpers.lang()
+
+        # search and get the translated title for facet
+        for facet in self.additional_facets:
+            if self.DATASET_FIELD_FIELD in facet:
+                # if 'facet_name' and 'dataset_type' exist, wins the 'facet_name'
+                if self.FACET_NAME_FIELD in facet:
+                    label_array = facet[self.FACET_NAME_FIELD]
+                    for key, value in label_array.iteritems():
+                        if key == language and value is not None:
+                            additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = value
+                        else:
+                            additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = facet[self.FACET_NAME_FIELD]
+                else:
+                    if facet[self.DATASET_TYPE_FIELD]:
+                        from ckanext.scheming import helpers as scheming_helpers
+                        package_type = self._get_dataset_type_of_facet(facet[self.DATASET_FIELD_FIELD])
+                        schema = scheming_helpers.scheming_get_dataset_schema(package_type)
+
+                        schema_name = facet[self.DATASET_FIELD_FIELD]
+                        #remove prefix in facet name
+                        schema_name = schema_name.replace('extras_', '')
+                        schema_name = schema_name.replace('res_extras_', '')
+                        # switch for dataset or resource
+                        if schema_name.startswith( 'res_' ):
+                           fields_from_schema = schema['resource_fields']
+                        else:
+                           fields_from_schema = schema['dataset_fields']
+
+                        for field in fields_from_schema:
+                            if field['field_name'] == schema_name and 'label' in field:
+                                additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = field['label']
+                                label_array = field['label']
+                                for key, value in label_array.iteritems():
+                                    if key == language and value is not None:
+                                        additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = value
+                                    else:
+                                        additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = field['label']
+
+        return additional_facets_name
+
+
     def _get_dataset_type_of_facet(self, dataset_facet_field):
         '''
         Get the dataset type, which contains the facet
         :param dataset_facet_field: name of facet field in the dataset (e.g: `extras_information_category`)
         '''
-        # get all additional facets
-        facets = self.additional_facets['facets']
         # set default dataset
         dataset_type = 'dataset'
         # if facets not empty
-        if facets:
-            for facet in facets:
+        if self.additional_facets:
+            for facet in self.additional_facets:
                 # get the concrete facet
-                if ('dataset_field' in facet) and (facet['dataset_field'] == dataset_facet_field) and ('dataset_type' in facet):
-                    dataset_type = facet['dataset_type']
+                if self.DATASET_FIELD_FIELD in facet and facet[self.DATASET_FIELD_FIELD] == dataset_facet_field and self.DATASET_TYPE_FIELD in facet:
+                    dataset_type = facet[self.DATASET_TYPE_FIELD]
 
         return dataset_type
 
@@ -177,15 +247,10 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
                 if len(entry['label']) > 1 and type(entry['label']) is dict:
                     label_array = entry['label']
                     for key, value in label_array.iteritems():
-                        if key == language:
-                            if value is not None:
-                                return value
-                            else:
-                                return default_facet_label
-                    if value is not None:
-                        return value
-                    else:
-                        return default_facet_label
+                        if key == language and value is not None:
+                            return value
+
+        return default_facet_label
 
 
     def _get_facet_item_label_with_translation(self, dataset_facet_field, default_facet_label):
