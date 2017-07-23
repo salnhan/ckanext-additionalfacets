@@ -23,7 +23,7 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
     CLEAR_DEFAULT_FACETS = 'ckanext.additional_facets.clear_default_facets'
 
     ##fields in the json/yaml file
-    DATASET_FIELD_FIELD = 'dataset_field'
+    DATASET_FIELD = 'dataset_field'
     DATASET_TYPE_FIELD = 'dataset_type'
     FACET_NAME_FIELD = 'facet_name'
     FACET_ITEMS_FIELD = 'facet_items'
@@ -106,13 +106,13 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
 
         # search and get the translated title for facet
         for facet in self.additional_facets:
-            if self.DATASET_FIELD_FIELD in facet and self.FACET_NAME_FIELD in facet:
+            if self.DATASET_FIELD in facet and self.FACET_NAME_FIELD in facet:
                 label_array = facet_item[self.FACET_NAME_FIELD]
                 for key, value in label_array.iteritems():
                     if key == language and value is not None:
-                         additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = value
+                         additional_facets_name[facet[self.DATASET_FIELD]] = value
                     else:
-                        additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = facet[self.FACET_NAME_FIELD]
+                        additional_facets_name[facet[self.DATASET_FIELD]] = facet[self.FACET_NAME_FIELD]
 
         return additional_facets_name
 
@@ -128,7 +128,7 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         if self.additional_facets:
             for facet in self.additional_facets:
                 # get the concrete facet
-                if self.DATASET_FIELD_FIELD in facet and facet[self.DATASET_FIELD_FIELD] == dataset_facet_field and self.FACET_ITEMS_FIELD in facet:
+                if self.DATASET_FIELD in facet and facet[self.DATASET_FIELD] == dataset_facet_field and self.FACET_ITEMS_FIELD in facet:
                     facet_items = facet[self.FACET_ITEMS_FIELD]
                     for facet_item in facet_items:
                         # translate the label of facet
@@ -183,40 +183,47 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
 
         # search and get the translated title for facet
         for facet in self.additional_facets:
-            if self.DATASET_FIELD_FIELD in facet:
+            if self.DATASET_FIELD in facet:
                 # if 'facet_name' and 'dataset_type' exist, wins the 'facet_name'
                 if self.FACET_NAME_FIELD in facet:
                     label_array = facet[self.FACET_NAME_FIELD]
                     for key, value in label_array.iteritems():
                         if key == language and value is not None:
-                            additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = value
+                            additional_facets_name[facet[self.DATASET_FIELD]] = value
                         else:
-                            additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = facet[self.FACET_NAME_FIELD]
+                            additional_facets_name[facet[self.DATASET_FIELD]] = facet[self.FACET_NAME_FIELD]
                 else:
                     if facet[self.DATASET_TYPE_FIELD]:
                         from ckanext.scheming import helpers as scheming_helpers
-                        package_type = self._get_dataset_type_of_facet(facet[self.DATASET_FIELD_FIELD])
+                        package_type = self._get_dataset_type_of_facet(facet[self.DATASET_FIELD])
                         schema = scheming_helpers.scheming_get_dataset_schema(package_type)
 
-                        schema_name = facet[self.DATASET_FIELD_FIELD]
+                        if schema is None:
+                            continue
+
+                        schema_name = facet[self.DATASET_FIELD]
                         #remove prefix in facet name
                         schema_name = schema_name.replace('extras_', '')
                         schema_name = schema_name.replace('res_extras_', '')
+
                         # switch for dataset or resource
-                        if schema_name.startswith( 'res_' ):
+                        if schema_name.startswith( 'res_' ) and 'resource_fields' in schema:
                            fields_from_schema = schema['resource_fields']
+                        elif 'dataset_fields' in schema:
+                            fields_from_schema = schema['dataset_fields']
                         else:
-                           fields_from_schema = schema['dataset_fields']
+                           continue
 
                         for field in fields_from_schema:
+                            # ckanext-scheming schemas
                             if field['field_name'] == schema_name and 'label' in field:
-                                additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = field['label']
+                                additional_facets_name[facet[self.DATASET_FIELD]] = field['label']
                                 label_array = field['label']
                                 for key, value in label_array.iteritems():
                                     if key == language and value is not None:
-                                        additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = value
+                                        additional_facets_name[facet[self.DATASET_FIELD]] = value
                                     else:
-                                        additional_facets_name[facet[self.DATASET_FIELD_FIELD]] = field['label']
+                                        additional_facets_name[facet[self.DATASET_FIELD]] = field['label']
 
         return additional_facets_name
 
@@ -232,7 +239,7 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
         if self.additional_facets:
             for facet in self.additional_facets:
                 # get the concrete facet
-                if self.DATASET_FIELD_FIELD in facet and facet[self.DATASET_FIELD_FIELD] == dataset_facet_field and self.DATASET_TYPE_FIELD in facet:
+                if self.DATASET_FIELD in facet and facet[self.DATASET_FIELD] == dataset_facet_field and self.DATASET_TYPE_FIELD in facet:
                     dataset_type = facet[self.DATASET_TYPE_FIELD]
 
         return dataset_type
@@ -253,6 +260,19 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
         return default_facet_label
 
 
+    def _get_facet_items_of_facet(self, dataset_facet_field, additional_facets):
+        '''
+        Get the facet items of a facet, which are defined in additional facets
+        :param dataset_facet_field: name of facet field in the dataset (e.g: `extras_information_category`)
+        :param additional_facets: list of additional facets
+        '''
+        if additional_facets:
+            for facet in additional_facets:
+                # get the concrete facet
+                if self.DATASET_FIELD in facet and facet[self.DATASET_FIELD] == dataset_facet_field and self.FACET_ITEMS_FIELD in facet:
+                   return facet[self.FACET_ITEMS_FIELD]
+
+
     def _get_facet_item_label_with_translation(self, dataset_facet_field, default_facet_label):
         '''
         Translate the default label of facet item. Return the default facet label if no translation available
@@ -262,48 +282,54 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
         from ckanext.scheming import helpers as scheming_helpers
         package_type = self._get_dataset_type_of_facet(dataset_facet_field)
         schema = scheming_helpers.scheming_get_dataset_schema(package_type)
-        language = scheming_helpers.lang()
 
-        schema_name = dataset_facet_field
-        #remove prefix in facet name
-        schema_name = schema_name.replace('extras_', '')
-        schema_name = schema_name.replace('res_extras_', '')
+        # if a facet has `facet_items` and `dataset_type`, wins `facet_items`
+        if self._get_facet_items_of_facet(dataset_facet_field, self.additional_facets) is None:
 
-        # switch for dataset or resource
-        if schema_name.startswith( 'res_' ):
-            fields_from_schema = schema['resource_fields']
-        else:
-            fields_from_schema = schema['dataset_fields']
+            # if schema exists
+            if schema is not None:
+                schema_name = dataset_facet_field
+                #remove prefix in facet name
+                schema_name = schema_name.replace('extras_', '')
+                schema_name = schema_name.replace('res_extras_', '')
 
-        for field in fields_from_schema:
-            if field['field_name'] == schema_name:
-                #if item key is given - see facet_list.html
-                if default_facet_label is not None:
-                    if 'choices' in field:
-                        return self._get_value_from_scheming_choices_field(field['choices'], default_facet_label, language)
-                    elif 'choices_helper' in field:
-                        from ckantoolkit import h
-                        choices_fn = getattr(h, field['choices_helper'])
-                        return self._get_value_from_scheming_choices_field(choices_fn(field), default_facet_label, language)
-                    else:
-                        return default_facet_label;
+                # switch for dataset or resource
+                if schema_name.startswith( 'res_' ) and 'resource_fields' in schema:
+                    fields_from_schema = schema['resource_fields']
+                elif 'dataset_fields' in schema:
+                    fields_from_schema = schema['dataset_fields']
                 else:
-                    if len(field['label']) > 1 and type(field['label']) is dict:
-                        label_array = field['label']
-                        for key, value in label_array.iteritems():
-                            if key == language:
+                    return self._translate_facet_item_label(dataset_facet_field, default_facet_label)
+
+                for field in fields_from_schema:
+                    if field['field_name'] == schema_name:
+                        #if item key is given - see facet_list.html
+                        if default_facet_label is not None:
+                            if 'choices' in field:
+                                return scheming_helpers.scheming_choices_label(field['choices'], default_facet_label)
+                            elif 'choices_helper' in field:
+                                from ckantoolkit import h
+                                choices_fn = getattr(h, field['choices_helper'])
+                                return scheming_helpers.scheming_choices_label(choices_fn(field), default_facet_label)
+                            else:
+                                return default_facet_label;
+                        else:
+                            if len(field['label']) > 1 and type(field['label']) is dict:
+                                label_array = field['label']
+                                language = scheming_helpers.lang()
+                                for key, value in label_array.iteritems():
+                                    if key == language:
+                                        if value is not None:
+                                            return value
+                                        else:
+                                            return default_facet_label
                                 if value is not None:
                                     return value
                                 else:
                                     return default_facet_label
-                        if value is not None:
-                            return value
-                        else:
-                            return default_facet_label
-                    if field['label'] is not None:
-                        return field['label']
-                    else:
-                        return default_facet_label
-
+                            if field['label'] is not None:
+                                return field['label']
+                            else:
+                                return default_facet_label
 
         return self._translate_facet_item_label(dataset_facet_field, default_facet_label)

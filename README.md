@@ -1,19 +1,18 @@
 # ckanext-additionalfacets
-Adds additional facets, which are defined in json/yml file, for ckan.
+Adds additional facets with tranlation, which are defined in json/yml file, for ckan without coding.
 
 ckanext-additionalfacets
 ========================
 
 The extension allows to add the additional facets into the facets list
-on the search page, the organzations page and the groups page without adjustment the code
+on the search page, the organzations page and the groups page without adjustment the code.
 
-You don't need to adjust you code to update the facets.
-You must only define you own facets in json or yaml file and link it to the ckan configuration and activate the plugin.
+To add the new additional facets you must only define you own facets in json or yaml file and link it to the ckan configuration and activate the plugin.
 
-The extension `ckanext-additionalfacets` supplies 2 plugins for displaying your own facets:
+The extension `ckanext-additionalfacets` provides 2 plugins for creating and displaying your own facets:
 
-* `additional_facets` - if the extension `ckanext-scheming` is not being used (your datasets are not created by `ckanext-scheming`)
-* `additional_facets_from_scheming_dataset` - if the extension `ckanext-scheming` is in being used (your datasets are created by `ckanext-scheming`)
+* `additional_facets` - if the extension `ckanext-scheming` is not being used (your meta data schemas are not created by `ckanext-scheming`)
+* `additional_facets_from_scheming_dataset` - if the extension `ckanext-scheming` is in being used (your meta data schemas are created by `ckanext-scheming`) (recommend)
 
 Requirements
 ============
@@ -76,14 +75,15 @@ ckanext.additional_facets.display_on_org_page = true
 Example for additional facets
 -----------------------------
 
-* In json - [default facets_json](ckanext/additionalfacets/default_facets.json)
-* In yaml - [default_facets_yml](ckanext/additionalfacets/default_facets.yml)
+* In json - [example facets_json](ckanext/additionalfacets/example_facets.json)
+* In yaml - [example_facets_yml](ckanext/additionalfacets/example_facets.yml)
 
-Example for dataset, which is created with ckanext-scheming
+Example for meta data schema, which is created with ckanext-scheming
 -----------------------------------------------------------
 
 * [dataset_json](ckanext/additionalfacets/scheming/basic/dataset.json)
 
+Additional facets are field `information_category` and `registerobject_type` from this schema
 
 Field Keys
 ----------
@@ -259,3 +259,33 @@ Additional facet items in yaml with translation
   facet_name:
     en: Author
     de: Autor
+```
+
+Avoid splitting of field values in faceted search in Solr
+---------------------------------------------------------
+After inserting additional facets, which are not configured in the schema.xml, the value of the facet
+will be split to sub values. And these sub values will be displayed as facet items of a facet
+
+Example: The Facet's value `Energy & Climate` will be split to `energy`, `climate`, ` eneryclimate` 
+
+If you don't want to see sub values of the facet in frontend, just insert the additional facet fields into the schema.xml of Solr as follow
+
+```xml
+<schema>
+    .....
+    <fields>
+        <field>
+                .....
+                <field name="extras_information_category" type="string" indexed="true" stored="true" multiValued="true"/>
+                <field name="extras_registerobject_type" type="string" indexed="true" stored="true" multiValued="true"/>
+                .....
+        </field>
+     </fields>
+     .....
+     <copyField source="extras_registerobject_type" dest="text"/>
+     <copyField source="extras_information_category" dest="text"/>
+     ......
+</schema>
+```
+
+See [example_schema_xml](ckanext/additionalfacets/solr/example_schema.xml) 

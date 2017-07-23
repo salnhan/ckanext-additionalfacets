@@ -1,6 +1,9 @@
+# facets: list of additional facets
+# dataset_type: the type of dataset (valid for ckanext-scheming's dataset)
 facets:
 - dataset_type: basic-dataset
   dataset_field: extras_information_category
+  # if `facet_name` does not exist, get the title of facet from field in `dataset_type`
   facet_name:
     en: Information categories
     de: Informationskategorien
@@ -10,6 +13,7 @@ facets:
   facet_name:
     en: Group
     de: Gruppe
+  # if `facet_items` does not exist, get the label of facet's item from field in `dataset_type`
   facet_items:
   - default_label: Bauen & Wohnen
     new_label:
