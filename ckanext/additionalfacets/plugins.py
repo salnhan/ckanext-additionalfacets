@@ -107,12 +107,13 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
         # search and get the translated title for facet
         for facet in self.additional_facets:
             if self.DATASET_FIELD in facet and self.FACET_NAME_FIELD in facet:
-                label_array = facet_item[self.FACET_NAME_FIELD]
-                for key, value in label_array.iteritems():
-                    if key == language and value is not None:
-                         additional_facets_name[facet[self.DATASET_FIELD]] = value
-                    else:
-                        additional_facets_name[facet[self.DATASET_FIELD]] = facet[self.FACET_NAME_FIELD]
+                if type(facet[self.FACET_NAME_FIELD]) is dict:
+                    label_array = facet[self.FACET_NAME_FIELD]
+                    for key, value in label_array.iteritems():
+                        if key == language and value is not None:
+                             additional_facets_name[facet[self.DATASET_FIELD]] = value
+                else:
+                    additional_facets_name[facet[self.DATASET_FIELD]] = facet[self.FACET_NAME_FIELD]
 
         return additional_facets_name
 
@@ -186,12 +187,13 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
             if self.DATASET_FIELD in facet:
                 # if 'facet_name' and 'dataset_type' exist, wins the 'facet_name'
                 if self.FACET_NAME_FIELD in facet:
-                    label_array = facet[self.FACET_NAME_FIELD]
-                    for key, value in label_array.iteritems():
-                        if key == language and value is not None:
-                            additional_facets_name[facet[self.DATASET_FIELD]] = value
-                        else:
-                            additional_facets_name[facet[self.DATASET_FIELD]] = facet[self.FACET_NAME_FIELD]
+                    if type(facet[self.FACET_NAME_FIELD]) is dict:
+                        label_array = facet[self.FACET_NAME_FIELD]
+                        for key, value in label_array.iteritems():
+                            if key == language and value is not None:
+                                additional_facets_name[facet[self.DATASET_FIELD]] = value
+                    else:
+                        additional_facets_name[facet[self.DATASET_FIELD]] =  facet[self.FACET_NAME_FIELD]
                 else:
                     if facet[self.DATASET_TYPE_FIELD]:
                         from ckanext.scheming import helpers as scheming_helpers
@@ -217,14 +219,13 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
                         for field in fields_from_schema:
                             # ckanext-scheming schemas
                             if field['field_name'] == schema_name and 'label' in field:
-                                additional_facets_name[facet[self.DATASET_FIELD]] = field['label']
-                                label_array = field['label']
-                                for key, value in label_array.iteritems():
-                                    if key == language and value is not None:
-                                        additional_facets_name[facet[self.DATASET_FIELD]] = value
-                                    else:
-                                        additional_facets_name[facet[self.DATASET_FIELD]] = field['label']
-
+                                if type(field['label']) is dict:
+                                    label_array = field['label']
+                                    for key, value in label_array.iteritems():
+                                        if key == language and value is not None:
+                                            additional_facets_name[facet[self.DATASET_FIELD]] = value
+                                else:
+                                    additional_facets_name[facet[self.DATASET_FIELD]] = value = field['label']
         return additional_facets_name
 
 
@@ -323,10 +324,6 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
                                             return value
                                         else:
                                             return default_facet_label
-                                if value is not None:
-                                    return value
-                                else:
-                                    return default_facet_label
                             if field['label'] is not None:
                                 return field['label']
                             else:
