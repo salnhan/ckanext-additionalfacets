@@ -43,18 +43,6 @@ def load_facets_module_path(relative_path):
         return load(open(file_path))
 
 
-def get_additional_facets_dict(facets_inputs):
-    '''
-    Get the list of facets
-    :param facets_inputs: facets inputs in config
-    '''
-    result = {}
-    for facets_input in facets_inputs:
-        additional_facets = load_facets_module_path(facets_input)
-        result[additional_facets['name']] = additional_facets
-    return result
-
-
 def get_additional_facets(facet_input):
     '''
     Get additional facets from input (single)
