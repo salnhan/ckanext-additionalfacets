@@ -111,9 +111,9 @@ class AdditionalFacetsPlugin(plugins.SingletonPlugin):
                     label_array = facet[self.FACET_NAME_FIELD]
                     for key, value in label_array.iteritems():
                         if key == language and value is not None:
-                             additional_facets_name[facet[self.DATASET_FIELD]] = value
+                             additional_facets_name[str(facet[self.DATASET_FIELD])] = value
                 else:
-                    additional_facets_name[facet[self.DATASET_FIELD]] = facet[self.FACET_NAME_FIELD]
+                    additional_facets_name[str(facet[self.DATASET_FIELD])] = facet[self.FACET_NAME_FIELD]
 
         return additional_facets_name
 
@@ -191,9 +191,9 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
                         label_array = facet[self.FACET_NAME_FIELD]
                         for key, value in label_array.iteritems():
                             if key == language and value is not None:
-                                additional_facets_name[facet[self.DATASET_FIELD]] = value
+                                additional_facets_name[str(facet[self.DATASET_FIELD])] = value
                     else:
-                        additional_facets_name[facet[self.DATASET_FIELD]] =  facet[self.FACET_NAME_FIELD]
+                        additional_facets_name[str(facet[self.DATASET_FIELD])] =  facet[self.FACET_NAME_FIELD]
                 else:
                     if facet[self.DATASET_TYPE_FIELD]:
                         from ckanext.scheming import helpers as scheming_helpers
@@ -223,9 +223,9 @@ class AdditionalFacetsFromSchemingDatasetPlugin(AdditionalFacetsPlugin):
                                     label_array = field['label']
                                     for key, value in label_array.iteritems():
                                         if key == language and value is not None:
-                                            additional_facets_name[facet[self.DATASET_FIELD]] = value
+                                            additional_facets_name[str(facet[self.DATASET_FIELD])] = value
                                 else:
-                                    additional_facets_name[facet[self.DATASET_FIELD]] = value = field['label']
+                                    additional_facets_name[str(facet[self.DATASET_FIELD])] = value = field['label']
         return additional_facets_name
 
 
